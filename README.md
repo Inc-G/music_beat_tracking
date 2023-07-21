@@ -14,6 +14,8 @@ appended to the result of the mel spectrogram its first order difference.
 
 (2) training. I train a neural network with 4 bidirectional gru layers and a dense layer at the end. I have to take a weighted loss (in the module custom_losses) to compensate the imbalanced dataset. Similarly the metrics are customized for the task of beat tracking (you can see them in custom_metrics).
 
+I trained it for around 150 epochs, and the top F-score was reached at about epoch 80.
+
 (3) from the output of the neural network to the beats. This is in the post_processing_and_clicks folder. To go from the outcome of the neural network to the predicted beats, I do the following:
 
 - Find (a probability distribution for) the tempo of the song. This is done, roughly speaking, by finding the auto-correlations of the outcomes of the neural network. The relevant function is find_prob_distribution_of_a_beat.
