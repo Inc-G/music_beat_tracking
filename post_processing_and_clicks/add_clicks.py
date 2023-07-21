@@ -8,7 +8,7 @@ import scipy
 import models
 import custom_metrics
 import parameters as params 
-import post_processing
+import main_post_processing
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -47,7 +47,7 @@ def predictions(song, model='', model_passed=True, model_loc='', len_frame=param
 def add_clicks(song, model='', model_passed=True, model_loc='', output_name='name.wav', plot=False):
     preds = predictions(song, model, model_passed, model_loc, len_frame=10*params.LEN_FRAME)
     
-    beats = post_processing.frames_with_beat(preds, plot=plot)
+    beats = main_post_processing.frames_with_beat(preds, plot=plot)
     beats_f = custom_metrics.from_frames_to_times(beats)
     
     if plot:
