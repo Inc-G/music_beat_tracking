@@ -28,6 +28,7 @@ curve = curve/curve.sum() #curve to weight the correlation. Works as a prior on 
 pd.DataFrame(curve).plot(title='weight for the correlation with an emphasis at '+str(params.LIKELY_BPM)+' bpm')
 plt.show()
 
+## functions to find the tempo
 
 def weighted_correlation(predictions, len_frame=params.LEN_FRAME, shift=params.SHIFT):
     """
@@ -47,18 +48,6 @@ def weighted_correlation(predictions, len_frame=params.LEN_FRAME, shift=params.S
     second_half = cor[params.MEL_SAMPLING_RATE + shift:]*curve
     
     return second_half/second_half.sum()
-
-def get_a_beat(predictions, w_cor):
-    """
-    predictions: tf.tensor of shape [1, len_song]
-    w_cor: np.array, the ouput of w_cor = weighted_correlation(predictions).
-    
-    Gets a beat by convolving the predictions with the curved correlation (the output of weighted_correlation), adding
-    the predictions, and taking argmax.
-    """
-    beat_detected = np.argmax(2*predictions.numpy()[0] + np.convolve(predictions.numpy()[0], w_cor, 'same'))
-    return beat_detected
-
 
 def prob_beat(mode, mel_sampling_rate=params.MEL_SAMPLING_RATE):
     """
@@ -109,6 +98,22 @@ def find_prob_distribution_of_a_beat(w_cor, shift=params.SHIFT, plot=False):
             
     return prob_beat(actual_peak)[:(actual_peak*3)//2 + 1]
 
+
+### function to get a beat
+
+def get_a_beat(predictions, w_cor):
+    """
+    predictions: tf.tensor of shape [1, len_song]
+    w_cor: np.array, the ouput of w_cor = weighted_correlation(predictions).
+    
+    Gets a beat by convolving the predictions with the curved correlation (the output of weighted_correlation), adding
+    the predictions, and taking argmax.
+    """
+    beat_detected = np.argmax(2*predictions.numpy()[0] + np.convolve(predictions.numpy()[0], w_cor, 'same'))
+    return beat_detected
+
+
+## functions to get all beats
 
 def search_after(predictions, predicted_beat, prob_distribution):
     """
