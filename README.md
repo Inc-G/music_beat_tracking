@@ -2,7 +2,7 @@
 
 This is a project where I try to have a beat tracking algorithm for music.
 
-Parts of it are heavily inspired by the paper 2007 "Beat Tracking by Dynamic Programming" by Daniel P.W. Ellis, in "Journal of New Music Research"; and by the 2011 paper "Enhanced beat tracking with context-aware neural networks" by S Böck, M Schedl, in Proc. Int. Conf. Digital Audio Effects.
+Parts of it are heavily inspired by the 2007 paper "Beat Tracking by Dynamic Programming" by Daniel P.W. Ellis, in "Journal of New Music Research"; and by the 2011 paper "Enhanced beat tracking with context-aware neural networks" by S Böck, M Schedl, in Proc. Int. Conf. Digital Audio Effects.
 
 
 The project, roughly speaking, is divided into three parts:
