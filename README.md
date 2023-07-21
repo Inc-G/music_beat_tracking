@@ -16,7 +16,7 @@ appended to the result of the mel spectrogram its first order difference.
 
 (3) from the output of the neural network to the beats. This is in the post_processing_and_clicks folder. To go from the outcome of the neural network to the predicted beats, I do the following:
 
-- Find (a probability distribution for) the tempo of the song. This is done, roughly speaking, by finding the auto-correlations of the outcomes of the neural network. The relevant function is weighted_correlation in main_post_processing.py
+- Find (a probability distribution for) the tempo of the song. This is done, roughly speaking, by finding the auto-correlations of the outcomes of the neural network. The relevant function is find_prob_distribution_of_a_beat.
 - Find one beat in the song; the relevant function is get_a_beat.
 - Find the beats after and before the found beat. To find the beat after a beat x, I take the element-wise product of the a probability distribution for a tempo * outcomes of the nn, and find a peak. The relevant functions are search_after and search_before.
 
