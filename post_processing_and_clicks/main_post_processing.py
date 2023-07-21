@@ -37,11 +37,14 @@ def weighted_correlation(predictions, len_frame=params.LEN_FRAME, shift=params.S
     
     Gets the renormalized self correlation of the predictions.
     """
+    beginning = (params.NUM_SECONDS - 1)*len_frame//params.NUM_SECONDS
+    end = (params.NUM_SECONDS + 1)*len_frame//params.NUM_SECONDS
+    
     cor = np.correlate(predictions.numpy()[0,:len_frame],
                        predictions.numpy()[0,:len_frame],
-                       'full')[4*len_frame//5:6*len_frame//5]
+                       'full')[beginning:end]
     
-    second_half = cor[43 + shift:]*curve
+    second_half = cor[params.MEL_SAMPLING_RATE + shift:]*curve
     
     return second_half/second_half.sum()
 
