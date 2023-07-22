@@ -15,7 +15,7 @@ TOTAL_FRAMES = 653952
 TOTAL_0_BEATS = 620769
 
 ## custom metrics variables
-NUM_SECONDS = 5
+NUM_SECONDS = 10
 LEN_FRAME = MEL_SAMPLING_RATE*NUM_SECONDS
 WINDOW = .07 #for metrics and downsample
 
