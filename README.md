@@ -2,7 +2,7 @@
 ## Usage
 Download the weights from model_weights, and add clicks to your songs with the function add_clicks from add_clicks.py (in the post_processing folder). To run add_clicks, download all the modules in that folder, the folder model_weights, and the libraries in the .yaml file that you find in the folder post_processing. It will add clicks to the first parameters.NUM_SECONDS seconds.
 
-Coming (hopefully) soon: a web-app to make all of the above much less friction.
+Coming (hopefully) soon: a web-app to make all of the above easier to use.
 
 ## On this project
 
