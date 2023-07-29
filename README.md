@@ -7,6 +7,8 @@ The piece of music you upload should have constant tempo.
 ## Examples
 You can find some examples of end results in flask_webapp/static.
 
+https://github.com/Inc-G/music_beat_tracking/assets/55004390/2bd3c48e-e45b-4463-b780-06fd688a9918
+
 ## On this project
 
 This is a project where I try to have a beat tracking algorithm for music.
