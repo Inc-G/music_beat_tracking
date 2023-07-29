@@ -17,7 +17,7 @@ https://github.com/Inc-G/music_beat_tracking/assets/55004390/15d63fc2-2021-41b2-
 
 ## On this project
 
-This is a project where I try to have a beat tracking algorithm for music.
+In this project I created a beat tracking algorithm for music.
 
 Parts of it are heavily inspired by the 2007 paper "Beat Tracking by Dynamic Programming" by Daniel P.W. Ellis, in "Journal of New Music Research"; and by the 2011 paper "Enhanced beat tracking with context-aware neural networks" by S Böck, M Schedl, in Proc. Int. Conf. Digital Audio Effects.
 
