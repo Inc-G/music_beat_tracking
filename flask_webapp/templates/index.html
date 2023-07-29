@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="shortcut icon" href="#">
+    <title>Beat Finder</title>
+</head>
+<body>
+    <h1>Beat Finder</h1>
+    <p style="font-size:18px;">After uploading your song, it will be preprocessed, passed to a neural network, and postprocessed to add the beats to it.</p>
+    <form action="/upload" method="post" enctype="multipart/form-data" id="upload-form">
+        <label for="file_id">Select a file:</label>
+        <input type="file" name="file" id="file_id">
+        <input type="submit" id="submitButton" value="Upload File">
+    </form>
+
+    <audio controls id="audioPlayer1" hidden>
+        <!-- The source element will be added dynamically after the song is uploaded -->
+        Your browser does not support the audio element.
+    </audio>
+    <p></p>
+    
+
+    <p id='song_uploaded_succesfully'></p>
+    <button type="button" id='buttonAddClicks' hidden>Add beats</button>
+    <p> </p>
+
+    <audio id="audioPlayer" controls hidden>
+        Your browser does not support the audio element.
+    </audio>
+    <p> </p>
+
+    <button type="button" id='buttonNewSong' hidden>New song</button>
+
+    <script>
+        let song_name = 'placeholder';
+
+        function showElement(elementId) {
+            const element = document.getElementById(elementId);
+            element.hidden = false;
+        }
+
+        function hideElement(elementId) {
+            const element = document.getElementById(elementId);
+            element.hidden = true;
+        }
+
+        document.getElementById('upload-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default behaviour and handle the event manually
+
+            const form = event.target;
+            const formData = new FormData(form);
+
+            song_name = document.getElementById('file_id').files[0].name;
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(message => {
+                console.log(message); // Server response message
+                form.reset(); // Reset the form after successful upload
+                const successMessage = song_name + ' song uploaded successfully';
+                document.getElementById('song_uploaded_succesfully').innerText = successMessage;
+                showElement('buttonAddClicks');
+                const audioSourceUrl = "/static/uploaded_songs/" + song_name;
+                const audioPlayer1 = document.getElementById('audioPlayer1');
+                audioPlayer1.src = audioSourceUrl;
+                audioPlayer1.load();
+                audioPlayer1.addEventListener('canplaythrough', function() {
+                    showElement('audioPlayer1');
+                });
+            });
+        });
+
+        document.getElementById('buttonAddClicks').addEventListener('click', function(event) {
+            document.getElementById('buttonAddClicks').innerText = 'Adding beats, processing the song...';
+            fetch('/get_beat', {
+                method: 'POST',
+                body: JSON.stringify(song_name)
+            })
+            .then(response => response.text())
+            .then(message => {
+                console.log(message); // Server response message
+                const audioSourceUrl = "/static/" + song_name.slice(0, -4) + '_clicks.wav';
+                const audioPlayer = document.getElementById('audioPlayer');
+                audioPlayer.src = audioSourceUrl;
+                audioPlayer.load();
+                audioPlayer.addEventListener('canplaythrough', function() {
+                    showElement('audioPlayer');
+                    showElement('buttonNewSong');
+                });
+            });    
+        });
+
+        document.getElementById('buttonNewSong').addEventListener('click', function(event) {
+            document.getElementById('song_uploaded_succesfully').innerText = '';
+            document.getElementById('buttonAddClicks').innerText = 'Add beats';
+            hideElement('buttonAddClicks');
+            hideElement('audioPlayer');
+            document.getElementById('audioPlayer').pause();
+            hideElement('audioPlayer1');
+            document.getElementById('audioPlayer1').pause();
+            hideElement('buttonNewSong');
+        });
+    </script>
+</body>
+</html>
+
