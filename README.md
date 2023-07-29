@@ -5,9 +5,13 @@ Install all the packages in the .yml file beat_tracking.yml, go to the folder fl
 The piece of music you upload should have constant tempo.
 
 ## Examples
-You can find some examples of end results in flask_webapp/static.
+You can find some examples of end results in flask_webapp/static. Below I report three of them.
 
 https://github.com/Inc-G/music_beat_tracking/assets/55004390/2bd3c48e-e45b-4463-b780-06fd688a9918
+
+https://github.com/Inc-G/music_beat_tracking/assets/55004390/497db2f2-643c-47f2-9195-c44ff20de00b
+
+https://github.com/Inc-G/music_beat_tracking/assets/55004390/670ef95a-0fdc-4b54-ab2b-db1fd0d02fa1
 
 ## On this project
 
