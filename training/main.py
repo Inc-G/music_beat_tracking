@@ -18,34 +18,18 @@ import pickle
 
 
 ### gets the inputs
-with open('shuffled_indices.npy', 'rb') as f:
-    indices = np.load(f)
-    f.close()
 
-indices = np.array(indices)
-len_indices = indices.shape[0]
-val_idx = np.array(list(range(len_indices)))[indices<(len_indices//5)] # 20% is for validation
-train_idx = np.array(list(range(len_indices)))[indices>=(len_indices//5)] # 80% is for training
-
-
-all_transformed_inputs = np.load('songs_train/transformed_inputs.npy')
-
-print('len validation test: ', val_idx.shape)
-
-transformed_inputs = all_transformed_inputs[train_idx,:,:]
-transformed_inputs_test = all_transformed_inputs[val_idx,:,:] 
+transformed_inputs = np.load('songs_train/transformed_inputs.npy')
+transformed_inputs_test = np.load('songs_test/transformed_inputs_test.npy')
 
 transformed_inputs = np.transpose(transformed_inputs, [0,2,1])
 transformed_inputs_test = np.transpose(transformed_inputs_test, [0,2,1])
 
-all_outputs = np.load('songs_train/training_target.npy')
-outputs = all_outputs[train_idx,:]
-outputs_test = all_outputs[val_idx,:] 
+outputs = np.load('songs_train/training_target.npy')
+outputs_test = np.load('songs_test/test_target.npy')
 
 print('shape validation test input: ',transformed_inputs_test.shape)
 print('shape train test input: ',transformed_inputs.shape)
-
-
 
 
 optimizer = tf.keras.optimizers.Adam()
