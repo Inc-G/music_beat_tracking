@@ -208,3 +208,7 @@ def training_loop(my_model=model, my_optimizer=optimizer, loss_fn=loss,
 
         if (epoch - 2)%25 != 0 and epoch>1:
             shutil.rmtree('epoch_'+str(epoch-1))
+            
+        if epoch == 125:
+            print('Changed optimizer lr at epoch 125')
+            optimizer.lr = 0.0001
