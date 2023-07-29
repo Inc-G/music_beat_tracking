@@ -1,9 +1,11 @@
 # music_beat_tracking
 ## Usage
-Install all the packages in the .yml file beat_tracking.yml, go to the folder flask_webapp and run webapp_beat_tracking.py.
+Install all the packages in the .yml file beat_tracking.yml, go to the folder flask_webapp and run webapp_beat_tracking.py. After uploading your own piece of music,  if you click "add beats" it will add beats to your piece of music.
+
+The piece of music you upload should have constant tempo.
 
 ## Examples
-You can see some examples in flask_webapp/static
+You can find some examples of end results in flask_webapp/static.
 
 ## On this project
 
