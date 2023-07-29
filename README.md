@@ -7,14 +7,13 @@ The piece of music you upload should have constant tempo.
 ## Examples
 You can find some examples of end results in flask_webapp/static. Below I report three of them, and an example of the webapp.
 
-
 https://github.com/Inc-G/music_beat_tracking/assets/55004390/0c525fad-2824-4103-8b04-d31a717cdfb7
 
-https://github.com/Inc-G/music_beat_tracking/assets/55004390/2bd3c48e-e45b-4463-b780-06fd688a9918
+https://github.com/Inc-G/music_beat_tracking/assets/55004390/47e04011-9233-4c49-bbd1-cfa01ef834eb
 
-https://github.com/Inc-G/music_beat_tracking/assets/55004390/497db2f2-643c-47f2-9195-c44ff20de00b
+https://github.com/Inc-G/music_beat_tracking/assets/55004390/f01cff71-83d7-4205-9032-8e6b1011f587
 
-https://github.com/Inc-G/music_beat_tracking/assets/55004390/670ef95a-0fdc-4b54-ab2b-db1fd0d02fa1
+https://github.com/Inc-G/music_beat_tracking/assets/55004390/15d63fc2-2021-41b2-86c4-adb06414518a
 
 ## On this project
 
