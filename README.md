@@ -2,6 +2,9 @@
 ## Usage
 Install all the packages in the .yml file beat_tracking.yml, go to the folder flask_webapp and run webapp_beat_tracking.py.
 
+## Examples
+You can see some examples in flask_webapp/static
+
 ## On this project
 
 This is a project where I try to have a beat tracking algorithm for music.
