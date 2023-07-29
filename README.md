@@ -18,9 +18,9 @@ The project, roughly speaking, is divided into three parts:
 Essentially, after uniformizing a bit the dataset, each song is sampled with sampling rate 22016, then I take the mel spectrogram of it, converted to decibels, and
 appended to the result of the mel spectrogram its first order difference. 
 
-(2) training. I train a neural network with 4 bidirectional gru layers and a dense layer at the end. I have to take a weighted loss (in the module custom_losses) to compensate the imbalanced dataset. Similarly the metrics are customized for the task of beat tracking (you can see them in custom_metrics).
+(2) training. I train a neural network with 3 bidirectional gru layers and a dense layer at the end. I have to take a weighted loss (in the module custom_losses) to compensate the imbalanced dataset. Similarly the metrics are customized for the task of beat tracking (you can see them in custom_metrics). I tried with 2 or 4 gru layers too, but the best performance seems to be with 3 layers.
 
-I trained it for around 150 epochs, and the top F-score was reached at about epoch 80.
+I trained it for around 175 epochs, at epoch 125 I changed the learning rate from .001 to .0001; and the top F-score was reached at about epoch 150.
 
 (3) from the output of the neural network to the beats. This is in the post_processing_and_clicks folder. To go from the outcome of the neural network to the predicted beats, I do the following:
 
