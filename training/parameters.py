@@ -7,7 +7,7 @@ MIN = -81
 MAX = 13
 
 ## model variables
-NUM_GRU_LAYERS = 4
+NUM_GRU_LAYERS = 3
 
 ## custom loss variables
 TOTAL_1_BEATS = 33183
