@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 
 import tensorflow as tf
 
-
 def gaussian(x, mean=0):
     """
     auxiliar
@@ -25,10 +24,9 @@ frame_cut = params.MEL_SAMPLING_RATE*cut
 curve = np.exp(-1/8 * np.log2(np.arange(0,40,1)/frame_cut)**2)
 curve = curve/curve.sum() #curve to weight the correlation. Works as a prior on the tempo, see weighted_correlation below.
 
-pd.DataFrame(curve).plot(title='weight for the correlation with an emphasis at '+str(params.LIKELY_BPM)+' bpm')
-plt.show()
+#pd.DataFrame(curve).plot(title='weight for the correlation with an emphasis at '+str(params.LIKELY_BPM)+' bpm')
+#plt.show()
 
-## functions to find the tempo
 
 def weighted_correlation(predictions, len_frame=params.LEN_FRAME, shift=params.SHIFT):
     """
@@ -46,8 +44,19 @@ def weighted_correlation(predictions, len_frame=params.LEN_FRAME, shift=params.S
                        'full')[beginning:end]
     
     second_half = cor[params.MEL_SAMPLING_RATE + shift:]*curve
-    
     return second_half/second_half.sum()
+
+def get_a_beat(predictions, w_cor):
+    """
+    predictions: tf.tensor of shape [1, len_song]
+    w_cor: np.array, the ouput of w_cor = weighted_correlation(predictions).
+    
+    Gets a beat by convolving the predictions with the curved correlation (the output of weighted_correlation), adding
+    the predictions, and taking argmax.
+    """
+    beat_detected = np.argmax(2*predictions.numpy()[0] + np.convolve(predictions.numpy()[0], w_cor, 'same'))
+    return beat_detected
+
 
 def prob_beat(mode, mel_sampling_rate=params.MEL_SAMPLING_RATE):
     """
@@ -64,7 +73,7 @@ def prob_beat(mode, mel_sampling_rate=params.MEL_SAMPLING_RATE):
     vals = np.arange(1, mel_sampling_rate)
     return np.concatenate([np.zeros(1),gaussian(np.log2(vals/mode))])
 
-def find_prob_distribution_of_a_beat(w_cor, shift=params.SHIFT, plot=False):
+def find_prob_distribution_of_a_beat(w_cor, shift=params.SHIFT, constant_tempo=True, plot=False,):
     """
     w_corr: the output of weighted_correlation
     Returns: np.1darray
@@ -95,25 +104,19 @@ def find_prob_distribution_of_a_beat(w_cor, shift=params.SHIFT, plot=False):
         
         pd.DataFrame(prob_beat(actual_peak)[:(actual_peak*3)//2 + 1]).plot(title='prob distribution')
         plt.show()
-            
-    return prob_beat(actual_peak)[:(actual_peak*3)//2 + 1]
-
-
-### function to get a beat
-
-def get_a_beat(predictions, w_cor):
-    """
-    predictions: tf.tensor of shape [1, len_song]
-    w_cor: np.array, the ouput of w_cor = weighted_correlation(predictions).
     
-    Gets a beat by convolving the predictions with the curved correlation (the output of weighted_correlation), adding
-    the predictions, and taking argmax.
-    """
-    beat_detected = np.argmax(2*predictions.numpy()[0] + np.convolve(predictions.numpy()[0], w_cor, 'same'))
-    return beat_detected
+    if constant_tempo:
+        curve = prob_beat(actual_peak)[:(actual_peak*3)//2 + 1]
+        res = []
+        for idx, el in enumerate(curve):
+            if abs(idx - actual_peak) <= 3:
+                res.append(el)
+            else:
+                res.append(0)
+        return np.array(res)
+    else:
+        return prob_beat(actual_peak)[:(actual_peak*3)//2 + 1]
 
-
-## functions to get all beats
 
 def search_after(predictions, predicted_beat, prob_distribution):
     """
@@ -155,14 +158,14 @@ def search_before(predictions, predicted_beat, prob_distribution):
         current_beat -= len(prob_distribution) - prev_beat 
     return result
 
-def frames_with_beat(predictions, plot=False):
+def frames_with_beat(predictions, constant_tempo=True, plot=False):
     """
     predictions: tf.tensor of shape [1, len_song]. The output of the neural network
     
     returns: a list of length LEN_FRAME with 1 at frame i iff there is a beat at frame i
     """  
     w_cor = weighted_correlation(predictions)
-    prob_distribution = find_prob_distribution_of_a_beat(w_cor, plot=plot)
+    prob_distribution = find_prob_distribution_of_a_beat(w_cor, constant_tempo=constant_tempo, plot=plot)
     
     single_beat = get_a_beat(predictions, w_cor)
     
