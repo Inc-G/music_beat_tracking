@@ -1,9 +1,11 @@
-import tensorflow as tf
+import gc  #garbage collector module
 
+import tensorflow as tf
 import models
 import custom_losses
 import custom_metrics
 import parameters as params
+import main_post_processing as post_processing
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -15,7 +17,6 @@ import pandas as pd
 import os
 import shutil
 import pickle
-
 
 ### gets the inputs
 
@@ -79,7 +80,7 @@ def training_loop(my_model=model, my_optimizer=optimizer, loss_fn=loss,
                   X_train=transformed_inputs, y_train=outputs,
                   X_test=transformed_inputs_test, y_test=outputs_test,
                   beginning=0, epochs=params.EPOCHS, steps_per_epoch=params.STEPS_PER_EPOCH,
-                  test_batch_size=params.TEST_BATCH_SIZE,
+                  test_batch_size=params.TEST_BATCH_SIZE, lr_decay=params.DECAY,
                   save_model_at_checkpoint=True, model_for_saving=model_save, max_F_score=max_F_score,
                   past_loss=past_loss, past_loss_test=past_loss_test,
                   F_scores=F_scores):
@@ -98,101 +99,99 @@ def training_loop(my_model=model, my_optimizer=optimizer, loss_fn=loss,
             new_loss = gradient_step(X_batch, y_batch, my_model=my_model,loss_fn=loss_fn,
                                      my_optimizer=my_optimizer)
             past_loss.append(new_loss.numpy())
+            del X_batch, y_batch
             #print('past_loss', past_loss)
 
         ## Test
         predictions = []
         true_results = []
         for test_step in range(steps_per_epoch):
-            X_batch_test, y_batch_test = get_batch(X_test, y_test, batch_size=test_batch_size)
+            X_batch_test, y_batch_test = get_batch(X_test, y_test, batch_size=params.TEST_BATCH_SIZE)
 
             y_pred_test = model(X_batch_test)
             new_loss_test = loss_fn(y_batch_test, y_pred_test)
+
+            #once computed the loss, post process to get more relevan metrics.
+            y_pred_test = post_processing.frames_with_beat_batch(y_pred_test)
             past_loss_test.append(new_loss_test.numpy())
 
             if len(predictions) != 0:
-                predictions = np.concatenate((predictions, np.round(y_pred_test.numpy()).astype(int)))
+                predictions = np.concatenate((predictions, np.round(y_pred_test).astype(int)))
             else:
-                predictions = np.round(y_pred_test.numpy()).astype(int)
+                predictions = np.round(y_pred_test).astype(int)
 
             if len(true_results) == 0:
                 true_results = y_batch_test.astype(int)
             else:
                 true_results = np.concatenate((true_results, y_batch_test.astype(int)))
 
-        os.makedirs('epoch_'+str(epoch))
+        optimizer.lr = optimizer.lr*lr_decay
 
-        ## Plot loss
-        loss1 = pd.DataFrame(past_loss, columns = ['train loss'])
-        loss2 = pd.DataFrame(past_loss_test, columns = ['test loss'])
-
-        loss_df = loss1.join(loss2)
-        loss_df.plot(figsize = (18,12))
-        plt.savefig('epoch_'+str(epoch)+'/loss.png')
-        plt.close()
-
-        rolling_loss = loss_df.rolling(window=50).mean().dropna()
-        rolling_loss.columns = ['rolling loss train', 'rolling loss test']
-        rolling_loss.plot(figsize = (18,12))
-        plt.savefig('epoch_'+str(epoch)+'/rolling_loss.png')
-        plt.close()
-
-        ## Metrics ##
         true_times = custom_metrics.from_frames_to_times_batch(true_results)
         predicted_times = custom_metrics.from_frames_to_ds_times_batch(predictions)
-
-        cm = custom_metrics.batched_average_cm(true_times, predicted_times)
         F_score = custom_metrics.batched_average_F_score(true_times, predicted_times)
+        F_scores.append(F_score)
 
-        plotting_module.plot_cm(cm, my_labels=['Not beat','Beat'], title='Confusion matrix with F-score '+ str(F_score),
+
+        ## Plot loss
+        if epoch%5 == 0:
+            os.makedirs('epoch_'+str(epoch))
+            loss1 = pd.DataFrame(past_loss, columns = ['train loss'])
+            loss2 = pd.DataFrame(past_loss_test, columns = ['test loss'])
+
+            loss_df = loss1.join(loss2)
+            loss_df.plot(figsize = (18,12))
+            plt.savefig('epoch_'+str(epoch)+'/loss.png')
+            plt.close()
+
+            rolling_loss = loss_df.rolling(window=50).mean().dropna()
+            rolling_loss.columns = ['rolling loss train', 'rolling loss test']
+            rolling_loss.plot(figsize = (18,12))
+            plt.savefig('epoch_'+str(epoch)+'/rolling_loss.png')
+            plt.close()
+            del loss1, loss2, loss_df, rolling_loss
+
+            ## Metrics ##
+            cm = custom_metrics.batched_average_cm(true_times, predicted_times)
+            del true_times, predicted_times
+
+            plotting_module.plot_cm(cm, my_labels=['Not beat','Beat'], title='Confusion matrix with F-score '+ str(F_score),
                                 savefig=True,name_saved_fig='epoch_'+str(epoch)+'/confusion_matrix.png',
                                 show=False)
-        plt.close()
+            plt.close()
 
-        F_scores.append(F_score)
-        pd.DataFrame(F_scores, columns=['F-scores']).plot(figsize = (18,12))
-        plt.savefig('epoch_'+str(epoch)+'/F_score.png')
-        plt.close()
+            F_score_ds = pd.DataFrame(F_scores, columns=['F-scores'])
+            F_score_ds.plot(figsize = (18,12))
+            plt.savefig('epoch_'+str(epoch)+'/F_score.png')
+            plt.close()
+            del F_score_ds
 
+            if epoch > 20:
+                rolling_F_score_ds = pd.DataFrame(F_scores, columns=['rolling F-scores']).rolling(15).mean()
+                rolling_F_score_ds.plot(figsize = (18,12))
+                plt.savefig('epoch_'+str(epoch)+'/F_score_rolling.png')
+                plt.close()
+                del rolling_F_score_ds
 
-        ## Checkpoints
-        if save_model_at_checkpoint:
-            if max_F_score < .8:
-                next_treshold = max_F_score + (1-max_F_score)/4
-            elif max_F_score < .9:
-                next_treshold = max_F_score + (1-max_F_score)/8
-            elif max_F_score < .99:
-                next_treshold = max_F_score + .01
-            else:
-                next_treshold = max_F_score + (1-max_F_score)/32
+            ## Checkpoints
+            if save_model_at_checkpoint:
+                if epoch%25 == 0:
+                    print('Saving model at checkpoint')
+                    models.save_weights(my_model, model_for_saving, 'model_epoch_'+str(epoch))
+                    os.makedirs('data_at_epoch_'+str(epoch))
+                    with open('data_at_epoch_'+str(epoch)+'/past_loss.pkl', 'wb') as f:
+                        pickle.dump(past_loss, f)
+                        f.close()
+                    with open('data_at_epoch_'+str(epoch)+'/past_loss_test.pkl', 'wb') as f:
+                        pickle.dump(past_loss_test, f)
+                        f.close()
+                    with open('data_at_epoch_'+str(epoch)+'/F_scores.pkl', 'wb') as f:
+                        pickle.dump(F_scores, f)
+                        f.close()
 
+            plt.close('all')
 
-            if next_treshold < F_score:
-                max_F_score = F_score
-                print('**********************')
-                print('New best F-score:', F_score)
-                print('**********************')
-                models.save_weights(my_model, model_for_saving, 'F_score'+str(F_score))
-            if epoch%25 == 0:
-                print('Saving model at checkpoint')
-                models.save_weights(my_model, model_for_saving, 'model_epoch_'+str(epoch))
-                os.makedirs('data_at_epoch_'+str(epoch))
-                with open('data_at_epoch_'+str(epoch)+'/past_loss.pkl', 'wb') as f:
-                    pickle.dump(past_loss, f)
-                    f.close()
-                with open('data_at_epoch_'+str(epoch)+'/past_loss_test.pkl', 'wb') as f:
-                    pickle.dump(past_loss_test, f)
-                    f.close()
-                with open('data_at_epoch_'+str(epoch)+'/F_scores.pkl', 'wb') as f:
-                    pickle.dump(F_scores, f)
-                    f.close()
+            gc.collect()
 
-        del true_times
-        del predicted_times
-
-        if (epoch - 2)%25 != 0 and epoch>1:
-            shutil.rmtree('epoch_'+str(epoch-1))
-            
-        if epoch == 125:
-            print('Changed optimizer lr at epoch 125')
-            optimizer.lr = 0.0001
+            if epoch>5 and (epoch-5)%25 !=0:
+                shutil.rmtree('epoch_'+str(epoch-5))
