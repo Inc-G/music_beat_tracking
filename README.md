@@ -32,7 +32,7 @@ appended to the result of the mel spectrogram its first order difference.
 
 (2) training. I train a neural network with 8 bidirectional gru layers and a dense layer at the end. I have to take a weighted loss (in the module custom_losses) to compensate the imbalanced dataset, and the decay for the learning rate is .98 (applied at each epoch, see training/main.py). Similarly the metrics are customized for the task of beat tracking (you can see them in custom_metrics). 
 
-I trained it for 300 epochs, see the metrics at training/metrics_at_epoch_300.
+I trained it for 300 epochs, see the metrics at training/metrics_at_epoch_300. The results of the metrics are after post-processing the predictions of the neural network.
 
 (3) from the output of the neural network to the beats. This is in the post_processing_and_clicks folder. To go from the outcome of the neural network to the predicted beats, I do the following:
 
