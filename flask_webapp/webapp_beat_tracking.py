@@ -1,10 +1,3 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
-
-import os
-
-import soundfile as sf
-import librosa
-
 import tensorflow as tf
 import numpy as np
 import models
@@ -20,10 +13,7 @@ app = Flask(__name__)
 
 # Specify the folder where uploaded files will be stored
 UPLOAD_FOLDER = 'static/uploaded_songs'
-FOLDER_WITH_CLICKS = 'with_clicks'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-constant_tempo = False
 
 
 @app.route('/')
@@ -56,7 +46,7 @@ def get_beat():
     loc_clicks = 'static/'  + song_name[:-4] +'_clicks.wav'
 
     add_clicks.add_clicks(song=loc, model=model, model_passed=True, model_loc='',
-        output_name=loc_clicks, constant_tempo=False, plot=False)
+        output_name=loc_clicks, constant_tempo=True, plot=False)
     
     return "beats added successfully"
 
