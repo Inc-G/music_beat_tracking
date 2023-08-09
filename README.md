@@ -9,11 +9,12 @@ You can find some examples of end results in flask_webapp/static. Below I report
 
 https://github.com/Inc-G/music_beat_tracking/assets/55004390/0c525fad-2824-4103-8b04-d31a717cdfb7
 
-https://github.com/Inc-G/music_beat_tracking/assets/55004390/47e04011-9233-4c49-bbd1-cfa01ef834eb
+https://github.com/Inc-G/music_beat_tracking/assets/55004390/cdde0f8c-ee8d-466b-b621-cdbbf305e068
 
-https://github.com/Inc-G/music_beat_tracking/assets/55004390/f01cff71-83d7-4205-9032-8e6b1011f587
+https://github.com/Inc-G/music_beat_tracking/assets/55004390/9f1f1de4-e88e-4469-aa19-d06c826413fc
 
-https://github.com/Inc-G/music_beat_tracking/assets/55004390/15d63fc2-2021-41b2-86c4-adb06414518a
+https://github.com/Inc-G/music_beat_tracking/assets/55004390/2b07520d-6d63-4fe9-b982-16374560f454
+
 
 ## On this project
 
