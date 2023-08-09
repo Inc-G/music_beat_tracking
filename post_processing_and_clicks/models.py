@@ -1,13 +1,12 @@
 import tensorflow as tf
 import parameters as params
 
-NUM_GRU_LAYERS = params.NUM_GRU_LAYERS
 
 class bidirectional_model(tf.keras.Model):
-    def __init__(self, num_bidirectional_layers=NUM_GRU_LAYERS):
+    def __init__(self, num_bidirectional_layers=params.NUM_GRU_LAYERS):
         super(bidirectional_model, self).__init__()
         self.bidirectional_layers = [
-            tf.keras.layers.Bidirectional(tf.keras.layers.GRU(64, return_sequences=True))
+            tf.keras.layers.Bidirectional(tf.keras.layers.GRU(params.GRU_WIDTH, return_sequences=True))
                                      for _ in range(num_bidirectional_layers)
                                     ]
         
@@ -20,10 +19,10 @@ class bidirectional_model(tf.keras.Model):
         return tf.reshape(self.final_layer(x), [self.final_layer(x).shape[0], self.final_layer(x).shape[1]])
     
 class bidirectional_model_for_save(tf.keras.Model):
-    def __init__(self, num_bidirectional_layers=NUM_GRU_LAYERS):
+    def __init__(self, num_bidirectional_layers=params.NUM_GRU_LAYERS):
         super(bidirectional_model_for_save, self).__init__()
         self.bidirectional_layers = [
-            tf.keras.layers.Bidirectional(tf.keras.layers.GRU(64, return_sequences=True))
+            tf.keras.layers.Bidirectional(tf.keras.layers.GRU(params.GRU_WIDTH, return_sequences=True))
                                      for _ in range(num_bidirectional_layers)
                                     ]
         
