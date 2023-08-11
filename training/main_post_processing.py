@@ -64,7 +64,7 @@ def prob_beat(mode, mel_sampling_rate=params.MEL_SAMPLING_RATE):
 
     mode: float.
 
-    Unnormalized probability distribution with given mean over the integers from 0 to mel_sampling_rate.
+    Unnormalized probability distribution with given mode over the integers from 0 to mel_sampling_rate.
     The probability distribution is the log2 of a gaussian. 
     
     It is needed to find the next beat, and log2 is there as the probability of having a beat after (2^n)t times
