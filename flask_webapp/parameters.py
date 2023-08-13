@@ -21,7 +21,7 @@ LEN_FRAME = MEL_SAMPLING_RATE*NUM_SECONDS
 WINDOW = .07 #for metrics and downsample
 
 ## training variables 
-EPOCHS = 150
+EPOCHS = 300
 BATCH_SIZE = 64
 STEPS_PER_EPOCH = 60
 TEST_BATCH_SIZE = 20
