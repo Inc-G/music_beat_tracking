@@ -132,9 +132,8 @@ def training_loop(my_model=model, my_optimizer=optimizer, loss_fn=loss,
         F_score = custom_metrics.batched_average_F_score(true_times, predicted_times)
         F_scores.append(F_score)
 
-
-        ## Plot loss
         if epoch%5 == 0:
+            ## Plot loss
             os.makedirs('epoch_'+str(epoch))
             loss1 = pd.DataFrame(past_loss, columns = ['train loss'])
             loss2 = pd.DataFrame(past_loss_test, columns = ['test loss'])
