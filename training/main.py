@@ -25,7 +25,6 @@ transformed_inputs_test = np.transpose(np.load('songs_test/transformed_inputs_te
 transformed_inputs_ballroom = np.transpose(np.load('songs_train/transformed_inputs_ballroom.npy'), [0,2,1])
 transformed_inputs_test_ballroom= np.transpose(np.load('songs_test/transformed_inputs_test_ballroom.npy'), [0,2,1])
 
-
 outputs = np.load('songs_train/training_target.npy')[:,:1248]
 outputs_test = np.load('songs_test/test_target.npy')[:,:1248]
 outputs_ballroom = np.load('songs_train/training_target_ballroom.npy')
@@ -38,7 +37,6 @@ outputs_test = np.concatenate([outputs_test, outputs_test_ballroom], axis=0)
 
 print('shape test input: ',transformed_inputs_test.shape)
 print('shape train input: ',transformed_inputs.shape)
-
 
 optimizer = tf.keras.optimizers.Adam()
 loss = custom_losses.weighted_bce
@@ -57,7 +55,6 @@ def get_batch(database_X, database_y, batch_size=params.BATCH_SIZE, len_frame=pa
 
     return np.array(X), np.array(y)
 
-
 def gradient_step(X, y, my_model, loss_fn=loss, return_loss=True, my_optimizer=optimizer):
     """
     Perform a step of gradient descent updating the loss if past_loss is passed (past_loss != None).
@@ -74,7 +71,6 @@ def gradient_step(X, y, my_model, loss_fn=loss, return_loss=True, my_optimizer=o
     if return_loss:
         return my_loss
 
-
 # Metrics for training
 past_loss = []
 past_loss_test = []
@@ -85,7 +81,6 @@ model = models.bidirectional_model()
 model_save = models.bidirectional_model_for_save()
 model_save(transformed_inputs[:1])
 model(transformed_inputs[:1])
-
 
 def training_loop(my_model=model, my_optimizer=optimizer, loss_fn=loss,
                   X_train=transformed_inputs, y_train=outputs,
@@ -144,7 +139,6 @@ def training_loop(my_model=model, my_optimizer=optimizer, loss_fn=loss,
         F_score = custom_metrics.batched_average_F_score(true_times, predicted_times)
         F_scores.append(F_score)
 
-
         if epoch%10 == 0:
             ## Plot loss
             os.makedirs('epoch_'+str(epoch))
@@ -200,11 +194,8 @@ def training_loop(my_model=model, my_optimizer=optimizer, loss_fn=loss,
                     with open('data_at_epoch_'+str(epoch)+'/F_scores.pkl', 'wb') as f:
                         pickle.dump(F_scores, f)
                         f.close()
-
-
-
+            
             plt.close('all')
-
             gc.collect()
 
             if epoch>5 and (epoch-10)%50 !=0:
