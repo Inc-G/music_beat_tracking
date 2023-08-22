@@ -20,17 +20,24 @@ import pickle
 
 ### gets the inputs
 
-transformed_inputs = np.load('songs_train/transformed_inputs.npy')
-transformed_inputs_test = np.load('songs_test/transformed_inputs_test.npy')
+transformed_inputs = np.transpose(np.load('songs_train/transformed_inputs.npy'), [0,2,1])[:,:1248,:]
+transformed_inputs_test = np.transpose(np.load('songs_test/transformed_inputs_test.npy'), [0,2,1])[:,:1248,:]
+transformed_inputs_ballroom = np.transpose(np.load('songs_train/transformed_inputs_ballroom.npy'), [0,2,1])
+transformed_inputs_test_ballroom= np.transpose(np.load('songs_test/transformed_inputs_test_ballroom.npy'), [0,2,1])
 
-transformed_inputs = np.transpose(transformed_inputs, [0,2,1])
-transformed_inputs_test = np.transpose(transformed_inputs_test, [0,2,1])
 
-outputs = np.load('songs_train/training_target.npy')
-outputs_test = np.load('songs_test/test_target.npy')
+outputs = np.load('songs_train/training_target.npy')[:,:1248]
+outputs_test = np.load('songs_test/test_target.npy')[:,:1248]
+outputs_ballroom = np.load('songs_train/training_target_ballroom.npy')
+outputs_test_ballroom= np.load('songs_test/test_target_ballroom.npy')
 
-print('shape validation test input: ',transformed_inputs_test.shape)
-print('shape train test input: ',transformed_inputs.shape)
+transformed_inputs = np.concatenate([transformed_inputs, transformed_inputs_ballroom], axis=0)
+transformed_inputs_test = np.concatenate([transformed_inputs_test, transformed_inputs_test_ballroom], axis=0)
+outputs = np.concatenate([outputs, outputs_ballroom], axis=0)
+outputs_test = np.concatenate([outputs_test, outputs_test_ballroom], axis=0)
+
+print('shape test input: ',transformed_inputs_test.shape)
+print('shape train input: ',transformed_inputs.shape)
 
 
 optimizer = tf.keras.optimizers.Adam()
@@ -57,11 +64,13 @@ def gradient_step(X, y, my_model, loss_fn=loss, return_loss=True, my_optimizer=o
     X,y have to be encoded
     """
     with tf.GradientTape() as tape:
-        predictions = my_model(X)
+        predictions = my_model(X, training=True)
         my_loss = loss_fn(y, predictions)
 
     grads = tape.gradient(my_loss, my_model.trainable_variables)
     my_optimizer.apply_gradients(zip(grads, my_model.trainable_variables))
+    del tape
+    tf.keras.backend.clear_session()
     if return_loss:
         return my_loss
 
@@ -75,6 +84,8 @@ max_F_score = .5
 model = models.bidirectional_model()
 model_save = models.bidirectional_model_for_save()
 model_save(transformed_inputs[:1])
+model(transformed_inputs[:1])
+
 
 def training_loop(my_model=model, my_optimizer=optimizer, loss_fn=loss,
                   X_train=transformed_inputs, y_train=outputs,
@@ -124,6 +135,7 @@ def training_loop(my_model=model, my_optimizer=optimizer, loss_fn=loss,
                 true_results = y_batch_test.astype(int)
             else:
                 true_results = np.concatenate((true_results, y_batch_test.astype(int)))
+            del X_batch_test, y_batch_test, y_pred_test
 
         optimizer.lr = optimizer.lr*lr_decay
 
@@ -132,7 +144,8 @@ def training_loop(my_model=model, my_optimizer=optimizer, loss_fn=loss,
         F_score = custom_metrics.batched_average_F_score(true_times, predicted_times)
         F_scores.append(F_score)
 
-        if epoch%5 == 0:
+
+        if epoch%10 == 0:
             ## Plot loss
             os.makedirs('epoch_'+str(epoch))
             loss1 = pd.DataFrame(past_loss, columns = ['train loss'])
@@ -174,7 +187,7 @@ def training_loop(my_model=model, my_optimizer=optimizer, loss_fn=loss,
 
             ## Checkpoints
             if save_model_at_checkpoint:
-                if epoch%25 == 0:
+                if epoch%50 == 0:
                     print('Saving model at checkpoint')
                     models.save_weights(my_model, model_for_saving, 'model_epoch_'+str(epoch))
                     os.makedirs('data_at_epoch_'+str(epoch))
@@ -188,9 +201,11 @@ def training_loop(my_model=model, my_optimizer=optimizer, loss_fn=loss,
                         pickle.dump(F_scores, f)
                         f.close()
 
+
+
             plt.close('all')
 
             gc.collect()
 
-            if epoch>5 and (epoch-5)%25 !=0:
-                shutil.rmtree('epoch_'+str(epoch-5))
+            if epoch>5 and (epoch-10)%50 !=0:
+                shutil.rmtree('epoch_'+str(epoch-10))
