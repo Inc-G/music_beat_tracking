@@ -7,8 +7,8 @@ MIN = -81
 MAX = 13
 
 ## model variables
-NUM_GRU_LAYERS = 8
-GRU_WIDTH = 16
+NUM_GRU_LAYERS =10
+GRU_WIDTH = 20
 
 ## custom loss variables
 TOTAL_1_BEATS = 33183
@@ -25,11 +25,12 @@ EPOCHS = 300
 BATCH_SIZE = 64
 STEPS_PER_EPOCH = 60
 TEST_BATCH_SIZE = 20
-DECAY = .98
+DECAY = .99
 
 ## postprocessing variables
 LIKELY_BPM = 120
 SHIFT = 3
+
 
 ## postprocessing variables
 LIKELY_BPM = 190
