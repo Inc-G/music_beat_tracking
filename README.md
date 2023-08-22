@@ -27,10 +27,13 @@ The project, roughly speaking, is divided into three parts:
 
 (1) pre processing. The notebook I used is in the folder pre_processing.
 
-Essentially, after uniformizing a bit the dataset, each song is sampled with sampling rate 22016, then I take the mel spectrogram of it, converted to decibels, and
-appended to the result of the mel spectrogram its first order difference. 
+The two scripts preprocessing_GTZAN.py and preprocessing_ballroom.py are the relevant ones.
 
-(2) training. I train a neural network with 8 bidirectional gru layers and a dense layer at the end. I have to take a weighted loss (in the module custom_losses) to compensate the imbalanced dataset, and the decay for the learning rate is .98 (applied at each epoch, see training/main.py). Similarly the metrics are customized for the task of beat tracking (you can see them in custom_metrics). 
+Essentially, after exploring and uniformizing a bit the dataset, each song is sampled with sampling rate 22016, then I take the mel spectrogram of it, converted to decibels, and appended to the result of the mel spectrogram its first order difference. Each song in the ballroom dataset is first cut at the beginning so that it starts from the first beat, and at the end so that it lasts 29 seconds. This is to make the dataset uniform, as there are songs which have their first beat late.
+
+(2) training. I train a neural network with 5 bidirectional gru layers, followed by 5 pairs (bidirectional gru, dropout layer) and a dense layer at the end. I have to take a weighted loss (in the module custom_losses) to compensate the imbalanced dataset, and the decay for the learning rate is .99 (applied at each epoch, see training/main.py). Similarly the metrics are customized for the task of beat tracking (you can see them in custom_metrics). 
+
+The stream of information is: sample a batch of songs, sample 10 consecutive seconds from each song in the batch, feed the resulting batch of 10 seconds of song to the neural network to predict if there are beats.
 
 I trained it for 300 epochs, see the metrics at training/metrics_at_epoch_300. The results of the metrics are after post-processing the predictions of the neural network.
 
@@ -42,9 +45,23 @@ I trained it for 300 epochs, see the metrics at training/metrics_at_epoch_300. T
 
 There is also a function (namely, add_clicks) in add_clicks.py that adds the clicks to a song.
 
-# Relevant references for preprocessing:
+# Datasets:
 
-I used the database and annotations from https://github.com/CPJKU/BallroomAnnotations
+I used two datasets.
 
-This paper should be relevant too: 
-F. Krebs, S. Böck, and G. Widmer. Rhythmic Pattern Modeling for Beat and Downbeat Tracking in Musical Audio. Proceedings of the 14th International Society for Music Information Retrieval Conference (ISMIR), Curitiba, Brazil, 2013.  
+The GTZAN dataset which you can download here https://www.kaggle.com/datasets/andradaolteanu/gtzan-dataset-music-genre-classification
+I used these annotations http://anasynth.ircam.fr/home/english/media/GTZAN-rhythm
+
+The ballroom dataset and annotations from https://github.com/CPJKU/BallroomAnnotations
+
+These papers should be relevant: 
+- F. Krebs, S. Böck, and G. Widmer. Rhythmic Pattern Modeling for Beat and Downbeat Tracking in Musical Audio. Proceedings of the 14th International Society for Music Information Retrieval Conference (ISMIR), Curitiba, Brazil, 2013.  
+
+- U. Marchand, Q. Fresnel and G. Peeters, "GTZAN-Rhythm: extending the GTZAN test-set with beat, downbeat and swing annotations", in ISMIR 2015 Late-Breaking Session, Malaga, Spain
+
+# To replicate the results:
+
+Download the two datasets above, rename the GTZAN dataset 'GTZAN', and run the scripts for preprocessing. This will generate 8 .npy files; 4 of which from GTZAN and 4 from the ballroom dataset. Those are (train_inputs, train_outputs, test_inputs, test_outputs) for each dataset.
+
+Train the neural network (on colab or using a GPU, or lots of patience) using the script main.py in the training folder, and the 8 files from the previous step.
+
