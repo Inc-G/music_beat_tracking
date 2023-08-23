@@ -7,6 +7,7 @@ import librosa
 import soundfile as sf
 
 import numpy as np
+import parameters as params
 
 
 MEL_SAMPLING_RATE = params.MEL_SAMPLING_RATE
@@ -17,6 +18,8 @@ SONGS_LOC = 'BallroomData'
 
 GENRES = [SONGS_LOC+'/'+_ for _ in os.listdir(SONGS_LOC) if _ != '.DS_Store' and _!='allBallroomFiles' and _!='nada']
 
+
+print('Getting the annotations')
 names_songs_in_annotations = set(os.listdir(ANNOTATIONS_LOC))
 names_songs_in_annotations.remove('README.md')
 names_songs = []
@@ -24,15 +27,13 @@ for _ in names_songs_in_annotations:
     names_songs.append(_[:-6])
 
 
-## Creates four dictionaries:
+## Creates three dictionaries:
 #temps: (name of the song) --> times in seconds which have a beat
 #frames: (name of the song) --> frames which have a beat
-#time_first_beat: (name of the song) --> times in seconds which has the first beat. 
 #frame_first_beat: (name of the song) --> frame which has the first beat. 
 
 temps = {}
 frames = {}
-time_first_beat = {}
 frame_first_beat = {}
 
 
@@ -45,14 +46,13 @@ for name in names_songs:
         if len(time) > 0:
             temps[name].append(float(time[:-2]))
             if not first_beat_recorded:
-                time_first_beat[name] = float(time[:-2])
                 first_beat_recorded = True
     frames[name] = librosa.time_to_samples(temps[name], sr=SAMPLING_RATE)
     frame_first_beat[name] = frames[name][0]
 
 
 
-## Start all songs from the first beat
+## Rewrite each song so that it starts from the first beat. This will make the dataset more uniform
 for genre in GENRES:
     for song in os.listdir(genre):
         if song[-3:] == 'wav':
@@ -70,7 +70,7 @@ frames_starting_from_first_beat = {}
 for song in frames.keys():
     frames_starting_from_first_beat[song] = [_ - frame_first_beat[song] for _ in frames[song]]
 
-## Trim each song to up to 29 seconds. This is because most of the songs have more than 29 seconds, to make the database uniform
+## Trim each song to up to 29 seconds. This is because most of the songs have more than 29 seconds, to make the dataset more uniform
 for genre in GENRES:
     for song in os.listdir(genre):
         if song[-3:] =='wav':
@@ -87,7 +87,11 @@ for song in frames_starting_from_first_beat.keys():
     f = np.array(frames_starting_from_first_beat[song])
     frames_ending_at_29_secs[song] = f[f<SAMPLING_RATE*29].copy()
 
+del frames_starting_from_first_beat
 
+## Now that the songs are trimmed before and after, they are ready to be preprocessed.
+
+print('Encoding the songs and creating train-test datasets')
 all_mels = {}
 mels_train = {}
 mels_test = {}
@@ -114,23 +118,20 @@ for genre in GENRES:
                 print(res.shape)
             
 
-## Convert frames with beat to reflect the shape of mel spectrogram
-frames_with_beat = {}
-for song in frames_ending_at_29_secs.keys():
-    times = librosa.frames_to_time(frames_ending_at_29_secs[song], sr=SAMPLING_RATE)
-    new_frames = librosa.time_to_frames(times, sr=MEL_SAMPLING_RATE)
-    frames_with_beat[song] = new_frames 
-
+## Convert frames with beat to reflect the shape of mel spectrogram, and encode them
+print('Econding the annotations')
 frames_with_beat_encoded = {}
 for song in all_mels.keys():
+    times = librosa.frames_to_time(frames_ending_at_29_secs[song], sr=SAMPLING_RATE)
+    new_frames = librosa.time_to_frames(times, sr=MEL_SAMPLING_RATE)
     zeros = np.zeros(all_mels[song].shape[1])
-    for beat in frames_with_beat[song]:
+    for beat in new_frames:
         zeros[beat] = 1
-    frames_with_beat_encoded[song] = zeros 
+    frames_with_beat_encoded[song] = zeros
 
 del all_mels
 
-
+print('Create the train-test datasets')
 os.makedirs(SONGS_LOC+'_train') #Here we'll save all the files used for training
 os.makedirs(SONGS_LOC+'_test') #Here we'll save all the files used for test
 
