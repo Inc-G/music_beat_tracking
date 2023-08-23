@@ -89,8 +89,8 @@ for song in frames_starting_from_first_beat.keys():
 
 
 all_mels = {}
-mells_train = {}
-mells_test = {}
+mels_train = {}
+mels_test = {}
 
 for genre in GENRES:
     num_files = len(os.listdir(genre))
@@ -106,9 +106,9 @@ for genre in GENRES:
             if res.shape[-1] == 1248:
                 all_mels[song[:-4]] = res
                 if idx in training_set:
-                    mells_train[song[:-4]] = res
+                    mels_train[song[:-4]] = res
                 else:
-                    mells_test[song[:-4]] = res
+                    mels_test[song[:-4]] = res
             else:
                 print('song ' + song+' will be excluded as it is less than 29 seconds')
                 print(res.shape)
@@ -134,14 +134,14 @@ del all_mels
 os.makedirs(SONGS_LOC+'_train') #Here we'll save all the files used for training
 os.makedirs(SONGS_LOC+'_test') #Here we'll save all the files used for test
 
-training_input = np.stack([_ for _ in mells_train.values()])
-training_target = np.stack([frames_with_beat_encoded[song] for song in mells_train.keys()])
+training_input = np.stack([_ for _ in mels_train.values()])
+training_target = np.stack([frames_with_beat_encoded[song] for song in mels_train.keys()])
 np.save(SONGS_LOC+'_train/training_target_ballroom.npy', training_target)
 del training_target
 
 
-test_input = np.stack([_ for _ in mells_test.values()])
-test_target = np.stack([frames_with_beat_encoded[song] for song in mells_test.keys()])
+test_input = np.stack([_ for _ in mels_test.values()])
+test_target = np.stack([frames_with_beat_encoded[song] for song in mels_test.keys()])
 np.save(SONGS_LOC+'_test/test_target_ballroom.npy', test_target)
 del test_target
 
