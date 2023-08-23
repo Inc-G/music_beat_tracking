@@ -61,7 +61,7 @@ These papers should be relevant:
 
 # To replicate the results:
 
-Download the two datasets above, rename the GTZAN dataset 'GTZAN', and run the scripts for preprocessing. This will generate 8 .npy files; 4 of which from GTZAN and 4 from the ballroom dataset. Those are (train_inputs, train_outputs, test_inputs, test_outputs) for each dataset.
+Download the two datasets above, rename the GTZAN dataset 'GTZAN', and run the scripts for preprocessing in the same folders where there are the datasets. This will generate 8 .npy files; 4 of which from GTZAN and 4 from the ballroom dataset. Those are (train_inputs, train_outputs, test_inputs, test_outputs) for each dataset.
 
 Train the neural network (on colab or using a GPU, or lots of patience) using the script main.py in the training folder, and the 8 files from the previous step.
 
