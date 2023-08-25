@@ -61,7 +61,7 @@ def get_beat():
     loc_clicks = 'static/'  + song_name[:-4] +'_clicks.wav'
 
     add_clicks.add_clicks(song=loc, model=model, model_passed=True, model_loc='',
-        output_name=loc_clicks, constant_tempo=False, plot=False)
+        output_name=loc_clicks, constant_tempo=True, plot=False)
     
     return "beats added successfully"
 
