@@ -50,7 +50,7 @@ def predictions(song, model='', model_passed=True, model_loc='', len_frame=param
 
 def add_clicks(song, model='', model_passed=True, model_loc='', output_name='name.wav', constant_tempo=True, plot=False):
     """
-    song: string. The location where there is the song.
+    song: string. The location where there is the piece of music to which we will add the beats.
     model_passed: bool. If True, then model should be the model used. If false, it will load a model from model_loc
     output_name: string. Location where the .wav file of the song + clicks will be saved.
     constant_tempo: bool. Whether the track has constant tempo or not. 
