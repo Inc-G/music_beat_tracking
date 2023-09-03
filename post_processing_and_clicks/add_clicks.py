@@ -1,3 +1,7 @@
+"""
+The main function is add_clicks, it adds the clicks to a track of music.
+"""
+
 import librosa 
 import soundfile as sf
 
@@ -45,6 +49,15 @@ def predictions(song, model='', model_passed=True, model_loc='', len_frame=param
 
 
 def add_clicks(song, model='', model_passed=True, model_loc='', output_name='name.wav', constant_tempo=True, plot=False):
+    """
+    song: string. The location where there is the song.
+    model_passed: bool. If True, then model should be the model used. If false, it will load a model from model_loc
+    output_name: string. Location where the .wav file of the song + clicks will be saved.
+    constant_tempo: bool. Whether the track has constant tempo or not. 
+    plot: bool. If True, it will plot a bunch of graphs. Useful for debugging/understanding what main_post_processing does.
+
+    Adds the clicks to the piece of music saved at song. It uses either the model passed, or the model saved at model_loc.
+    """
     preds = predictions(song, model, model_passed, model_loc, len_frame=10*params.LEN_FRAME)
     
     beats = post_processing.frames_with_beat(preds, constant_tempo=constant_tempo, plot=plot)
