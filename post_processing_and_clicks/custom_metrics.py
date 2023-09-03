@@ -97,7 +97,7 @@ def cm(truth, predicted, window=params.WINDOW):
     
 def batched_average_cm(truth, predicted, window=params.WINDOW):
     """
-    computes the mean cm
+    computes the mean cm for a batch of pairs (truth, predicted)
     """
     res = []
     for idx in range(len(truth)):
@@ -107,7 +107,7 @@ def batched_average_cm(truth, predicted, window=params.WINDOW):
 
 def batched_average_F_score(truth, predicted, window=params.WINDOW):
     """
-    computes the mean cm
+    computes the mean F-score for a batch of pairs (truth, predicted)
     """
     res = []
     for idx in range(len(truth)):
@@ -117,7 +117,7 @@ def batched_average_F_score(truth, predicted, window=params.WINDOW):
 
 def from_frames_to_ds_times_batch(predicted, window=params.WINDOW):
     """
-    Applies downsample(from_frames_to_times()) to each entry in the batch.
+    Applies downsample(from_frames_to_times()) to each entry in the batch of predictions.
     """
     res = []
     for _ in predicted:
@@ -126,7 +126,7 @@ def from_frames_to_ds_times_batch(predicted, window=params.WINDOW):
 
 def from_frames_to_times_batch(truth, window=params.WINDOW):
     """
-    Applies from_frames_to_times() to each entry in the batch.
+    Applies from_frames_to_times() to each entry in the batch of truth.
     """
     res = []
     for _ in truth:
