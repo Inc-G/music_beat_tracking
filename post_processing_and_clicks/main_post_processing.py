@@ -1,3 +1,16 @@
+"""
+The main function is frames_with_beat. Given the predictions of the neural network, it finds the beats in the track, as follows:
+
+- Finds (a probability distribution for) the tempo of the song. This is done, roughly speaking, by finding the auto-correlations of the
+outcomes of the neural network. See the relevant function is find_prob_distribution_of_a_beat for more details.
+
+- Finds  one beat in the song; the relevant function is get_a_beat.
+
+- Finds the beats after and before the found beat. To find the beat after a beat x, I take the element-wise product of the
+probability distribution for a tempo * outcomes of the neural network, and find a peak.
+The relevant functions are search_after and search_before.
+"""
+
 import librosa 
 
 import numpy as np
@@ -34,7 +47,7 @@ def weighted_correlation(predictions, len_frame=params.LEN_FRAME, shift=params.S
     len_frame: int. length of the window where the time should stay constant
     shift: int. 
     
-    Gets the renormalized self correlation of the predictions.
+    Gets the (renormalized) self correlation of the predictions.
     """
     beginning = (params.NUM_SECONDS - 1)*len_frame//params.NUM_SECONDS
     end = (params.NUM_SECONDS + 1)*len_frame//params.NUM_SECONDS
