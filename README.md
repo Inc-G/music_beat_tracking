@@ -35,7 +35,7 @@ Essentially, after exploring and uniformizing a bit the dataset, each song is sa
 
 The stream of information is: sample a batch of songs, sample 10 consecutive seconds from each song in the batch, feed the resulting batch of 10 seconds of song to the neural network to predict the beats.
 
-As the model is trained on tracks of 10 seconds, so the best performance is for such tracks.
+As the model is trained on tracks of 10 seconds, the best performance is for such tracks.
 
 I trained it for 300 epochs, see the metrics at training/metrics_at_epoch_300. The results of the metrics are after post-processing the predictions of the neural network.
 
