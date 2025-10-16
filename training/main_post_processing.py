@@ -184,3 +184,11 @@ def frames_with_beat(predictions, constant_tempo=True, plot=False):
         if _ < predictions.shape[1]:
             beats_in_frames[_] = 1
     return beats_in_frames
+
+def frames_with_beat_batch(batched_predictions):
+    res = []
+    for _ in batched_predictions:
+        t2 = tf.reshape(_, (1, _.shape[0]))
+        res.append(frames_with_beat(t2, False))
+        del t2
+    return np.array(res, dtype='float32')
